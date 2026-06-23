@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 - 일기장</title>
+    <style>
+        body { font-family: sans-serif; max-width: 360px; margin: 60px auto; }
+        input { display: block; width: 100%; margin: 8px 0; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; cursor: pointer; }
+        #result { margin-top: 16px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<h1>회원가입</h1>
+
+<form id="signupForm">
+    <input type="email" name="email" placeholder="이메일" required>
+    <input type="password" name="password" placeholder="비밀번호" required>
+    <input type="text" name="nickname" placeholder="닉네임" required>
+    <button type="submit">가입하기</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+            email: form.email.value,
+            password: form.password.value,
+            nickname: form.nickname.value
+        };
+
+        const res = await fetch('/api/members', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const body = await res.json();
+        const result = document.getElementById('result');
+        if (res.ok) {
+            result.style.color = 'green';
+            result.textContent = '가입 성공!\n' + JSON.stringify(body, null, 2);
+            form.reset();
+        } else {
+            result.style.color = 'red';
+            result.textContent = '실패: ' + (body.message || res.status);
+        }
+    });
+</script>
+</body>
+</html>
